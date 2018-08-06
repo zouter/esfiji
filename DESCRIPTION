@@ -1,5 +1,5 @@
-Package: esfiji
 Type: Package
+Package: esfiji
 Title: Automating common inkscape tasks programmatorically
 Version: 0.1.0
 Author: Wouter Saelens
@@ -11,3 +11,5 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.0.1
+Imports:
+  magick
