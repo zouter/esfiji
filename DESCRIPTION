@@ -1,0 +1,13 @@
+Package: esfiji
+Type: Package
+Title: Automating common inkscape tasks programmatorically
+Version: 0.1.0
+Author: Wouter Saelens
+Maintainer: Wouter Saelens <wouter.saelens@gmail.com>
+Description: This package automates common tasks from inkscape svg images, such
+             as generating smaller images from groups.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 6.0.1
