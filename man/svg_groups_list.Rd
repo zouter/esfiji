@@ -4,7 +4,8 @@
 \alias{svg_groups_list}
 \title{List the groups in an svg}
 \usage{
-svg_groups_list(svg, patterns = c("^(?!g[0-9]*).*$", "^(?!layer[0-9]*).*$"))
+svg_groups_list(svg, patterns = c("^(?!g[0-9]*).*$",
+  "^(?!layer[0-9]*).*$"))
 }
 \arguments{
 \item{svg}{The svg to use}

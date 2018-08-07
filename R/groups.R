@@ -1,6 +1,6 @@
-xml_find_multiple_ids <- function(xml, ids) {
-  ids_txt <- paste0(glue::glue("@id = \'"), ids, "\'", collapse = " or ")
-  xpath <- glue::glue(".//svg:g[{ids_txt}]")
+xml_find_multiple_ids <- function(xml, ids, attribute = "@id", node = "svg:g") {
+  ids_txt <- paste0(glue::glue("{attribute} = \'"), ids, "\'", collapse = " or ")
+  xpath <- glue::glue(".//{node}[{ids_txt}]")
 
   xml_find_all(xml, xpath)
 }
@@ -29,10 +29,13 @@ svg_groups_list <- function(
 #' @param svg The svg
 #' @param groups Tibble containing an id column (the id of the group) and an opacity column (double between 0 and 1)
 #' @param output The output name, will be appended with .svg and/or .png
+#' @param folder The folder in which the output will be saved
 #' @param verbose Verbosity
 #' @param export Inkscape argument for exporting
 #' @param trim Whether to trim the png
-#' @param folder The folder in which the output will be saved
+#' @param node What svg to look for, defaults to a group (which can include layers)
+#' @param attribute What attribute to look for, defaults to id
+#' @param output Whether to output the svg, png or pdf
 #'
 #' @return The location of the png image
 #'
@@ -41,14 +44,19 @@ svg_groups_opacify <- function(
   svg,
   groups,
   output,
+  folder = ".",
   verbose = FALSE,
   export = "--export-area-page",
   trim = FALSE,
-  folder = tempdir()
+  node = "svg:g",
+  attribute = "id",
+  output_format = "png"
 ) {
   if (!(all(c("opacity", "id") %in% colnames(groups)))) {
     stop("Need opacity")
   }
+
+  if (length(output) == 0) stop("Output needs to be png and/or svg")
 
   if (is.character(svg)) {
     svg <- read_xml(svg)
@@ -57,24 +65,41 @@ svg_groups_opacify <- function(
   walk(groups %>% split(groups$opacity), function(x) {
     nodes <- xml_find_multiple_ids(
       svg,
-      x$id
+      x$id,
+      node = node,
+      attribute = attribute
     )
     xml_attr(nodes, "style") <- glue::glue("opacity:{x$opacity[[1]]};")
   })
 
   svg_location <- glue::glue("{folder}/{output}.svg")
-  png_location <- glue::glue("{folder}/{output}.png")
+
 
   write(as.character(svg), file=svg_location)
-  system(glue::glue("inkscape {svg_location} --export-area-page --export-png={png_location} --export-dpi=300"), ignore.stdout = !verbose)
 
-  file.remove(svg_location)
-
-  if(trim) {
-    magick::image_trim(magick::image_read(png_location))
+  if ("svg" %in% output_format && trim) {
+    command <- glue::glue("inkscape --verb=FitCanvasToDrawing --verb=FileSave --verb=FileQuit {svg_location}")
+    system(command, ignore.stdout = !verbose)
   }
 
-  png_location
+  if ("png" %in% output_format) {
+    png_location <- glue::glue("{folder}/{output}.png")
+    system(glue::glue("inkscape {svg_location} --export-area-page --export-png={png_location} --export-dpi=300"), ignore.stdout = !verbose)
+
+    if(trim) {
+      magick::image_trim(magick::image_read(png_location))
+    }
+  }
+
+  if (!"svg" %in% output_format) {
+    file.remove(svg_location)
+  } else if ("png" %in% output) {
+    svg_location
+  }
+
+  if ("png" %in% output_format) {
+    png_location
+  }
 }
 
 #' Create smaller images from multiple groups in an svg
