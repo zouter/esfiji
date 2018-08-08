@@ -1,6 +1,6 @@
 xml_find_multiple_ids <- function(xml, ids, node = "svg:g", attribute = "id") {
-  ids_txt <- paste0(glue::glue("@{attribute} = \'"), ids, "\'", collapse = " or ")
-  xpath <- glue::glue(".//{node}[{ids_txt}]")
+  ids_txt <- paste0(glue("@{attribute} = \'"), ids, "\'", collapse = " or ")
+  xpath <- glue(".//{node}[{ids_txt}]")
 
   xml_find_all(xml, xpath)
 }
@@ -44,7 +44,7 @@ svg_groups_list <- function(
 #' @param trim Whether to trim the png
 #' @param node What svg to look for, defaults to a group (which can include layers)
 #' @param attribute What attribute to look for, defaults to id
-#' @param output Whether to output the svg, png or pdf
+#' @param output_format Whether to output the svg, png or pdf
 #'
 #' @return The location of the png image
 #'
@@ -79,20 +79,20 @@ svg_groups_opacify <- function(
 
     if (length(nodes) != nrow(x)) stop("Found ", length(nodes), " matching nodes, but needed ", nrow(x), ": ", x$id)
 
-    xml_attr(nodes, "style") <- glue::glue("opacity:{x$opacity[[1]]};")
+    xml_attr(nodes, "style") <- glue("opacity:{x$opacity[[1]]};")
   })
 
-  svg_location <- glue::glue("{folder}/{output}.svg")
+  svg_location <- glue("{folder}/{output}.svg")
   xml2::write_xml(svg, svg_location, options = NULL)
 
   if ("svg" %in% output_format && trim) {
-    command <- glue::glue("inkscape --verb=FitCanvasToDrawing --verb=FileSave --verb=FileQuit {svg_location}")
+    command <- glue("inkscape --verb=FitCanvasToDrawing --verb=FileSave --verb=FileQuit {svg_location}")
     system(command, ignore.stdout = !verbose)
   }
 
   if ("png" %in% output_format) {
-    png_location <- glue::glue("{folder}/{output}.png")
-    system(glue::glue("inkscape {svg_location} --export-area-page --export-png={png_location} --export-dpi=300"), ignore.stdout = !verbose)
+    png_location <- glue("{folder}/{output}.png")
+    system(glue("inkscape {svg_location} --export-area-page --export-png={png_location} --export-dpi=300"), ignore.stdout = !verbose)
 
     if(trim) {
       magick::image_read(png_location) %>% magick::image_trim() %>% magick::image_write(png_location)

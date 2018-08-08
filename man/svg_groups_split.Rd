@@ -13,6 +13,8 @@ svg_groups_split(svg, group_ids = svg_groups_list(svg), folder = ".",
 \item{group_ids}{The identifiers of the groups which will all be transparent expect one}
 
 \item{folder}{The folder in which the output will be saved}
+
+\item{output_format}{Whether to output the svg, png or pdf}
 }
 \description{
 Create smaller images from multiple groups in an svg

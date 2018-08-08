@@ -37,3 +37,10 @@ env:
 
 #services
 services:
+
+# apt
+addons:
+  apt:
+    update: true
+    packages:
+      - libmagick++-dev
