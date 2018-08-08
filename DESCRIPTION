@@ -2,7 +2,9 @@ Type: Package
 Package: esfiji
 Title: Automating common inkscape tasks programmatorically
 Version: 0.1.0
-Author: Wouter Saelens
+Authors@R: c(
+    person("Wouter", "Saelens", email = "wouter.saelens@ugent.be", role = c("cre", "aut"))
+  )
 Maintainer: Wouter Saelens <wouter.saelens@gmail.com>
 Description: This package automates common tasks from inkscape svg images, such
              as generating smaller images from groups.
