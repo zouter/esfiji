@@ -1,8 +1,15 @@
-xml_find_multiple_ids <- function(xml, ids, attribute = "@id", node = "svg:g") {
-  ids_txt <- paste0(glue::glue("{attribute} = \'"), ids, "\'", collapse = " or ")
+xml_find_multiple_ids <- function(xml, ids, node = "svg:g", attribute = "id") {
+  ids_txt <- paste0(glue::glue("@{attribute} = \'"), ids, "\'", collapse = " or ")
   xpath <- glue::glue(".//{node}[{ids_txt}]")
 
   xml_find_all(xml, xpath)
+}
+
+get_svg <- function(svg) {
+  if (is.character(svg)) {
+    svg <- read_xml(svg)
+  }
+  svg
 }
 
 #' List the groups in an svg
@@ -15,6 +22,8 @@ svg_groups_list <- function(
   svg,
   patterns = c("^(?!g[0-9]*).*$", "^(?!layer[0-9]*).*$")
 ) {
+  svg <- get_svg(svg)
+
   group_ids <- svg %>% xml_find_all(".//svg:g") %>% xml_attr("id") %>% as.character()
 
   for(pattern in patterns) {
@@ -58,9 +67,7 @@ svg_groups_opacify <- function(
 
   if (length(output) == 0) stop("Output needs to be png and/or svg")
 
-  if (is.character(svg)) {
-    svg <- read_xml(svg)
-  }
+  svg <- get_svg(svg)
 
   walk(groups %>% split(groups$opacity), function(x) {
     nodes <- xml_find_multiple_ids(
@@ -69,13 +76,14 @@ svg_groups_opacify <- function(
       node = node,
       attribute = attribute
     )
+
+    if (length(nodes) != nrow(x)) stop("Found ", length(nodes), " matching nodes, but needed ", nrow(x), ": ", x$id)
+
     xml_attr(nodes, "style") <- glue::glue("opacity:{x$opacity[[1]]};")
   })
 
   svg_location <- glue::glue("{folder}/{output}.svg")
-
-
-  write(as.character(svg), file=svg_location)
+  xml2::write_xml(svg, svg_location, options = NULL)
 
   if ("svg" %in% output_format && trim) {
     command <- glue::glue("inkscape --verb=FitCanvasToDrawing --verb=FileSave --verb=FileQuit {svg_location}")
@@ -87,7 +95,7 @@ svg_groups_opacify <- function(
     system(glue::glue("inkscape {svg_location} --export-area-page --export-png={png_location} --export-dpi=300"), ignore.stdout = !verbose)
 
     if(trim) {
-      magick::image_trim(magick::image_read(png_location))
+      magick::image_read(png_location) %>% magick::image_trim() %>% magick::image_write(png_location)
     }
   }
 
@@ -108,7 +116,7 @@ svg_groups_opacify <- function(
 #' @param group_ids The identifiers of the groups which will all be transparent expect one
 #'
 #' @export
-svg_groups_split <- function(svg, group_ids, folder) {
+svg_groups_split <- function(svg, group_ids = svg_groups_list(svg), folder = ".", output_format = "png") {
   groups <- tibble(
     id = group_ids,
     opacity = 1
@@ -116,17 +124,16 @@ svg_groups_split <- function(svg, group_ids, folder) {
 
   map(group_ids, function(group_id) {
     groups <- groups %>%
-      mutate(
-        opacity = ifelse(group_id == !!group_id, 1, 0)
-      )
+      mutate(opacity = ifelse(id == !!group_id, 1, 0))
 
-    opacify_svg_groups(
+    svg_groups_opacify(
       svg,
       groups,
       group_id,
       trim = TRUE,
       export = "--export-area-drawing",
-      folder = folder
+      folder = folder,
+      output_format = output_format
     )
   })
 }

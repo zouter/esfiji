@@ -4,7 +4,8 @@
 \alias{svg_groups_split}
 \title{Create smaller images from multiple groups in an svg}
 \usage{
-svg_groups_split(svg, group_ids, folder)
+svg_groups_split(svg, group_ids = svg_groups_list(svg), folder = ".",
+  output_format = "png")
 }
 \arguments{
 \item{svg}{The svg}
