@@ -3,3 +3,5 @@
 export(svg_groups_list)
 export(svg_groups_opacify)
 export(svg_groups_split)
+import(dplyr)
+import(xml2)

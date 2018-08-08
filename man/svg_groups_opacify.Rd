@@ -4,8 +4,9 @@
 \alias{svg_groups_opacify}
 \title{Change the opacity of svg groups}
 \usage{
-svg_groups_opacify(svg, groups, output, verbose = FALSE,
-  export = "--export-area-page", trim = FALSE, folder = tempdir())
+svg_groups_opacify(svg, groups, output, folder = ".", verbose = FALSE,
+  export = "--export-area-page", trim = FALSE, node = "svg:g",
+  attribute = "id", output_format = "png")
 }
 \arguments{
 \item{svg}{The svg}
@@ -14,13 +15,19 @@ svg_groups_opacify(svg, groups, output, verbose = FALSE,
 
 \item{output}{The output name, will be appended with .svg and/or .png}
 
+\item{folder}{The folder in which the output will be saved}
+
 \item{verbose}{Verbosity}
 
 \item{export}{Inkscape argument for exporting}
 
 \item{trim}{Whether to trim the png}
 
-\item{folder}{The folder in which the output will be saved}
+\item{node}{What svg to look for, defaults to a group (which can include layers)}
+
+\item{attribute}{What attribute to look for, defaults to id}
+
+\item{output}{Whether to output the svg, png or pdf}
 }
 \value{
 The location of the png image
