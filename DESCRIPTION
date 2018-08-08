@@ -17,4 +17,5 @@ Imports:
   magick,
   dplyr,
   xml2,
-  glue
+  glue,
+  stringr
