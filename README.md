@@ -1,5 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+![travis](https://api.travis-ci.org/zouter/esfiji.svg?branch=master)
+
 esfiji
 ======
 
