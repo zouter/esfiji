@@ -27,7 +27,7 @@ svg_groups_opacify(svg, groups, output, folder = ".", verbose = FALSE,
 
 \item{attribute}{What attribute to look for, defaults to id}
 
-\item{output}{Whether to output the svg, png or pdf}
+\item{output_format}{Whether to output the svg, png or pdf}
 }
 \value{
 The location of the png image
