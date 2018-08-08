@@ -18,4 +18,5 @@ Imports:
   dplyr,
   xml2,
   glue,
-  stringr
+  stringr,
+  purrr
