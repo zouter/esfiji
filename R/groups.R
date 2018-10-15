@@ -20,11 +20,13 @@ get_svg <- function(svg) {
 #' @export
 svg_groups_list <- function(
   svg,
-  patterns = c("^(?!g[0-9]*).*$", "^(?!layer[0-9]*).*$")
+  patterns = c("^(?!g[0-9]*).*$", "^(?!layer[0-9]*).*$"),
+  node = "*",
+  attr = "id"
 ) {
   svg <- get_svg(svg)
 
-  group_ids <- svg %>% xml_find_all(".//svg:g") %>% xml_attr("id") %>% as.character()
+  group_ids <- svg %>% xml_find_all(glue::glue(".//{node}")) %>% xml_attr(attr) %>% as.character() %>% unique()
 
   for(pattern in patterns) {
     group_ids <- group_ids %>% str_subset(pattern)
@@ -57,7 +59,7 @@ svg_groups_opacify <- function(
   verbose = FALSE,
   export = "--export-area-page",
   trim = FALSE,
-  node = "svg:g",
+  node = "*",
   attribute = "id",
   output_format = "png"
 ) {
@@ -77,9 +79,18 @@ svg_groups_opacify <- function(
       attribute = attribute
     )
 
-    if (length(nodes) != nrow(x)) stop("Found ", length(nodes), " matching nodes, but needed ", nrow(x), ": ", x$id)
+    if (length(nodes) < nrow(x)) stop("Found ", length(nodes), " matching nodes, but needed at least ", nrow(x), ": ", x$id)
 
-    xml_attr(nodes, "style") <- glue("opacity:{x$opacity[[1]]};")
+    for (node in nodes) {
+      if (!is.na(xml_attr(node, "style"))) {
+        basestyle <- xml_attr(node, "style")
+        basestyle <- basestyle %>% gsub(";opacity[^;]*;", "", .)
+        if (!endsWith(basestyle, ";")) {basestyle <- paste0(basestyle, ";")}
+      } else {
+        basestyle <- ""
+      }
+      xml_attr(node, "style") <- paste0(basestyle, glue("opacity:{x$opacity[[1]]};"))
+    }
   })
 
   svg_location <- glue("{folder}/{output}.svg")
@@ -87,12 +98,12 @@ svg_groups_opacify <- function(
 
   if ("svg" %in% output_format && trim) {
     command <- glue("inkscape --verb=FitCanvasToDrawing --verb=FileSave --verb=FileQuit {svg_location}")
-    system(command, ignore.stdout = !verbose)
+    system(command, ignore.stdout = !verbose, ignore.stderr = !verbose)
   }
 
   if ("png" %in% output_format) {
     png_location <- glue("{folder}/{output}.png")
-    system(glue("inkscape {svg_location} --export-area-page --export-png={png_location} --export-dpi=300"), ignore.stdout = !verbose)
+    system(glue("inkscape {svg_location} --export-area-page --export-png={png_location} --export-dpi=300"), ignore.stdout = !verbose, ignore.stderr = !verbose)
 
     if(trim) {
       magick::image_read(png_location) %>% magick::image_trim() %>% magick::image_write(png_location)
@@ -136,4 +147,42 @@ svg_groups_split <- function(svg, group_ids = svg_groups_list(svg), folder = "."
       output_format = output_format
     )
   })
+}
+
+
+
+#' Build up a larger images from the groups
+#'
+#' @inheritParams svg_groups_opacify
+#' @param group_ids The order by which the groups will be added
+#'
+#' @export
+svg_groups_split <- function(svg, group_ids = svg_groups_list(svg), folder = ".", output_format = "png", attribute = "fragment", output_prefix = "split", node = "*") {
+  groups <- tibble(
+    id = group_ids,
+    opacity = 0.05
+  )
+
+  i <- 1
+
+  for (group_id in group_ids) {
+    groups <- groups %>%
+      mutate(opacity = ifelse(id == !!group_id, 1, opacity))
+
+    svg_groups_opacify(
+      svg,
+      groups,
+      paste0(output_prefix, "_", sprintf("%02d", i), "_", group_id),
+      trim = FALSE,
+      export = "--export-area-drawing",
+      folder = folder,
+      output_format = output_format,
+      attribute = attribute,
+      node = node
+    )
+
+    i <- i + 1
+  }
+
+
 }

@@ -5,7 +5,7 @@
 \title{Change the opacity of svg groups}
 \usage{
 svg_groups_opacify(svg, groups, output, folder = ".", verbose = FALSE,
-  export = "--export-area-page", trim = FALSE, node = "svg:g",
+  export = "--export-area-page", trim = FALSE, node = "*",
   attribute = "id", output_format = "png")
 }
 \arguments{
