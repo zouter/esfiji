@@ -157,7 +157,7 @@ svg_groups_split <- function(svg, group_ids = svg_groups_list(svg), folder = "."
 #' @param group_ids The order by which the groups will be added
 #'
 #' @export
-svg_groups_split <- function(svg, group_ids = svg_groups_list(svg), folder = ".", output_format = "png", attribute = "fragment", output_prefix = "split", node = "*") {
+svg_groups_build <- function(svg, group_ids = svg_groups_list(svg), folder = ".", output_format = "png", attribute = "fragment", output_prefix = "split", node = "*") {
   groups <- tibble(
     id = group_ids,
     opacity = 0.05

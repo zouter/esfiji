@@ -5,12 +5,7 @@
 \title{Create smaller images from multiple groups in an svg}
 \usage{
 svg_groups_split(svg, group_ids = svg_groups_list(svg), folder = ".",
-  output_format = "png", attribute = "fragment",
-  output_prefix = "split", node = "*")
-
-svg_groups_split(svg, group_ids = svg_groups_list(svg), folder = ".",
-  output_format = "png", attribute = "fragment",
-  output_prefix = "split", node = "*")
+  output_format = "png")
 }
 \arguments{
 \item{svg}{The svg}
@@ -20,15 +15,7 @@ svg_groups_split(svg, group_ids = svg_groups_list(svg), folder = ".",
 \item{folder}{The folder in which the output will be saved}
 
 \item{output_format}{Whether to output the svg, png or pdf}
-
-\item{attribute}{What attribute to look for, defaults to id}
-
-\item{node}{What svg to look for, defaults to a group (which can include layers)}
-
-\item{group_ids}{The order by which the groups will be added}
 }
 \description{
 Create smaller images from multiple groups in an svg
-
-Build up a larger images from the groups
 }
