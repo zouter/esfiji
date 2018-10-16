@@ -11,6 +11,10 @@ svg_groups_list(svg, patterns = c("^(?!g[0-9]*).*$",
 \item{svg}{The svg to use}
 
 \item{patterns}{One or more regular expression patterns, used for consecutive filtering}
+
+\item{node}{What nodes to look for}
+
+\item{attr}{The attribute to look for}
 }
 \description{
 List the groups in an svg

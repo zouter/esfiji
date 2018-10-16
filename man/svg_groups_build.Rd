@@ -19,6 +19,8 @@ svg_groups_build(svg, group_ids = svg_groups_list(svg), folder = ".",
 
 \item{attribute}{What attribute to look for, defaults to id}
 
+\item{output_prefix}{The names of the output files will be prepended by this prefix}
+
 \item{node}{What svg to look for, defaults to a group (which can include layers)}
 }
 \description{

@@ -16,6 +16,8 @@ get_svg <- function(svg) {
 #'
 #' @param svg The svg to use
 #' @param patterns One or more regular expression patterns, used for consecutive filtering
+#' @param node What nodes to look for
+#' @param attr The attribute to look for
 #'
 #' @export
 svg_groups_list <- function(
@@ -155,6 +157,7 @@ svg_groups_split <- function(svg, group_ids = svg_groups_list(svg), folder = "."
 #'
 #' @inheritParams svg_groups_opacify
 #' @param group_ids The order by which the groups will be added
+#' @param output_prefix The names of the output files will be prepended by this prefix
 #'
 #' @export
 svg_groups_build <- function(svg, group_ids = svg_groups_list(svg), folder = ".", output_format = "png", attribute = "fragment", output_prefix = "split", node = "*") {
